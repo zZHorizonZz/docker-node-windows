@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: 
-        version: [ "22.7.0" ]
+        version: [ 22.7.0 ]
         variant: [ "windows-2019" ]
 
     steps:
@@ -48,8 +48,6 @@ jobs:
             Write-Host "Node version mismatch"
             exit 1 
           }
-
-          exit 0
         
       - name: Verify entrypoint runs regular, non-executable files with node
         shell: pwsh
@@ -101,8 +99,6 @@ jobs:
             Write-Host "Node version mismatch"
             exit 1
           }
-          
-          exit 0
         
       - name: Verify entrypoint runs regular, non-executable files with node
         shell: pwsh
