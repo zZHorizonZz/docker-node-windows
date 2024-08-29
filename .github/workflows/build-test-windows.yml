@@ -3,14 +3,14 @@ name: build-test-windows
 on:
   push:
     paths:
-      - "**/windows-2019/Dockerfile"
-      - "**/windows-2022/Dockerfile"
+      - "**/windows-2019/**"
+      - "**/windows-2022/**"
       - ".github/workflows/build-test-windows.yml"
 
   pull_request:
     paths:
-      - "**/windows-2019/Dockerfile"
-      - "**/windows-2022/Dockerfile"
+      - "**/windows-2019/**"
+      - "**/windows-2022/**"
       - ".github/workflows/build-test-windows.yml"
 
 jobs:
