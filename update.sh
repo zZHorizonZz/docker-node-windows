@@ -5,22 +5,24 @@ set -ue
 function usage() {
   cat << EOF
 
-  Update the node docker images.
+  Update the node Docker images.
 
   Usage:
-    $0 [-s] [MAJOR_VERSION(S)] [VARIANT(S)]
+    $0 [-s] [-w] [MAJOR_VERSION(S)] [VARIANT(S)]
 
   Examples:
-    - update.sh                      # Update all images
-    - update.sh -s                   # Update all images, skip updating Alpine and Yarn
-    - update.sh 8,10                 # Update all variants of version 8 and 10
-    - update.sh -s 8                 # Update version 8 and variants, skip updating Alpine and Yarn
-    - update.sh 8 alpine             # Update only alpine's variants for version 8
-    - update.sh -s 8 bullseye        # Update only bullseye variant for version 8, skip updating Alpine and Yarn
-    - update.sh . alpine             # Update the alpine variant for all versions
+    - update.sh                       # Update all images
+    - update.sh -s                    # Update all images, skip updating Alpine and Yarn
+    - update.sh -w                    # Update only Windows images
+    - update.sh 8,10                  # Update all variants of version 8 and 10
+    - update.sh -s 8                  # Update version 8 and variants, skip updating Alpine and Yarn
+    - update.sh 8 alpine              # Update only Alpine variants for version 8
+    - update.sh -w 8 windows-2022     # Update only Windows 2022 variant for version 8
+    - update.sh . alpine              # Update the Alpine variant for all versions
 
   OPTIONS:
-    -s Security update; skip updating the yarn and alpine versions.
+    -s Security update; skip updating the Yarn and Alpine versions.
+    -w Windows images update only
     -b CI config update only
     -h Show this message
 
@@ -28,10 +30,15 @@ EOF
 }
 
 SKIP=false
-while getopts "sh" opt; do
+WINDOWS_ONLY=false
+while getopts "swh" opt; do
   case "${opt}" in
     s)
       SKIP=true
+      shift
+      ;;
+    w)
+      WINDOWS_ONLY=true
       shift
       ;;
     h)
@@ -167,6 +174,17 @@ function update_node_version() {
       sed -Ei -e "s/(buildpack-deps:)name/\\1${variant}/" "${dockerfile}-tmp"
     elif is_debian_slim "${variant}"; then
       sed -Ei -e "s/(debian:)name-slim/\\1${variant}/" "${dockerfile}-tmp"
+    elif is_windows "${variant}"; then
+      windows_version="${variant#*windows-}"
+      checksum=$(
+        curl -sSL --compressed "https://nodejs.org/dist/v${nodeVersion}/SHASUMS256.txt" | grep "node-v${nodeVersion}-win-x64.zip" | cut -d' ' -f1
+      )
+      if [ -z "$checksum" ]; then
+        rm -f "${dockerfile}-tmp"
+        fatal "Failed to fetch checksum for version ${nodeVersion}"
+      fi
+      sed -Ei -e "s/mcr\.microsoft\.com\/windows\/servercore:version/mcr\.microsoft\.com\/windows\/servercore:ltsc${windows_version}/" "${dockerfile}-tmp"
+      sed -Ei -e 's/^(ENV CHECKSUM ).*/\1'"${checksum}"'/' "${dockerfile}-tmp"
     fi
 
     if diff -q "${dockerfile}-tmp" "${dockerfile}" > /dev/null; then
@@ -201,6 +219,8 @@ for version in "${versions[@]}"; do
   # See details in function.sh
   IFS=' ' read -ra variants <<< "$(get_variants "${parentpath}")"
 
+  echo "Supported variants for ${parentpath}: ${variants[@]}"
+
   pids=()
 
   if [ -f "${version}/Dockerfile" ]; then
@@ -223,9 +243,17 @@ for version in "${versions[@]}"; do
       template_file="${parentpath}/Dockerfile-slim.template"
     elif is_alpine "${variant}"; then
       template_file="${parentpath}/Dockerfile-alpine.template"
+    elif is_windows "${variant}"; then
+      template_file="${parentpath}/Dockerfile-windows.template"
+    fi
+    
+    # Copy .sh only if not is_windows
+    if ! is_windows "${variant}"; then
+      cp "${parentpath}/docker-entrypoint.sh" "${version}/${variant}/docker-entrypoint.sh"
+    elif is_windows "${variant}"; then
+      cp "${parentpath}/docker-entrypoint.ps1" "${version}/${variant}/docker-entrypoint.ps1"
     fi
 
-    cp "${parentpath}/docker-entrypoint.sh" "${version}/${variant}/docker-entrypoint.sh"
     if [ "${update_version}" -eq 0 ] && [ "${update_variant}" -eq 0 ]; then
       update_node_version "${baseuri}" "${versionnum}" "${template_file}" "${version}/${variant}/Dockerfile" "${variant}" &
       pids+=($!)

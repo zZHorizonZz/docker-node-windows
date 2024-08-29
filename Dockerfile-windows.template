@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/servercore:version
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
@@ -8,8 +8,8 @@ RUN $newPath = ('C:\nodejs;{0}\Yarn\bin;{1}' -f $env:LOCALAPPDATA, $env:PATH); \
 	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine)
 # doing this first to share cache across versions more aggressively
 
-ENV NODE_VERSION 22.7.0
-ENV CHECKSUM 3fc638727974262b4f65a6b1b43c22fb2d80671cdcb50e1237e0b05d1330aaf7
+ENV NODE_VERSION 0.0.0
+ENV CHECKSUM CHECKSUM_x64
 
 RUN $url = ('https://nodejs.org/dist/v{0}/node-v{0}-win-x64.zip' -f $env:NODE_VERSION); \
 	Write-Host ('Downloading {0} ...' -f $url); \
@@ -34,7 +34,7 @@ RUN $url = ('https://nodejs.org/dist/v{0}/node-v{0}-win-x64.zip' -f $env:NODE_VE
 	\
 	Write-Host 'Complete.'
 
-ENV YARN_VERSION 1.22.22
+ENV YARN_VERSION 0.0.0
 
 # "It is recommended to install Yarn through the npm package manager" (https://classic.yarnpkg.com/en/docs/install)
 RUN Write-Host 'Installing "yarn" ...'; \
