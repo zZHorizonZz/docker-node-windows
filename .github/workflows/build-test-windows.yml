@@ -35,6 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # We cannot use docker/build-push-action here because it requires buildx, which is not available on Windows
       - name: Build image
         run: |
           docker build --tag node:${{ matrix.version }}-${{ matrix.variant }} ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}
@@ -86,6 +87,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # We cannot use docker/build-push-action here because it requires buildx, which is not available on Windows
       - name: Build image
         run: |
           docker build --tag node:${{ matrix.version }}-${{ matrix.variant }} ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}
