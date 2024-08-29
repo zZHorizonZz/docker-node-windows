@@ -1,19 +1,16 @@
-name: build-test
+name: build-test-windows
 
 on:
   push:
     paths:
-      - "**/Dockerfile"
-      - "**/docker-entrypoint.sh"
-      - genMatrix.js
-      - ".github/workflows/build-test.yml"
+      - "**/windows/Dockerfile"
+      - ".github/workflows/build-test-windows.yml"
 
   pull_request:
     paths:
-      - "**/Dockerfile"
-      - "**/docker-entrypoint.sh"
+      - "**/windows/Dockerfile"
       - genMatrix.js
-      - ".github/workflows/build-test.yml"
+      - ".github/workflows/build-test-windows.yml"
 
 jobs:
   build:
