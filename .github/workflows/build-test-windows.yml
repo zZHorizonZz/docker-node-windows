@@ -39,20 +39,26 @@ jobs:
           docker build --file ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}/Dockerfile --tag node:${{ matrix.version }}-${{ matrix.variant }} .
 
       - name: Test for node version
+        shell: pwsh
         run: |
-          image_node_version=$(docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node")
-          echo "Expected: \"${{ matrix.version }}\", Got: \"${image_node_version}\""
-          [ "${image_node_version}" == "${{ matrix.version }}" ]
-
+          $image_node_version = (docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node")
+          Write-Host "Expected: '${{ matrix.version }}', Got: '$image_node_version'"
+          if ($image_node_version -ne ${{ matrix.version }}) {
+            exit 1 
+          }
+        
       - name: Verify entrypoint runs regular, non-executable files with node
+        shell: pwsh
         run: |
-          tmp_file=$(mktemp)
-          echo 'console.log("success")' > "${tmp_file}"
-          output=$(docker run --rm -v "${tmp_file}:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js)
-          [ "${output}" = 'success' ]
-
+          $tmp_file = New-TemporaryFile
+          "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
+          $output = (docker run --rm -v "${{ github.workspace }}\$tmp_file:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js)
+          if ($output -ne 'success') {
+            exit 1
+          }
+        
       - name: Test for npm
         run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} npm --version
-
+        
       - name: Test for yarn
         run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} yarn --version
