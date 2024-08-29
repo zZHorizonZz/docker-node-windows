@@ -46,6 +46,6 @@ RUN Write-Host 'Installing "yarn" ...'; \
 	Write-Host 'Complete.'
 
 COPY docker-entrypoint.ps1 C:/docker-entrypoint.ps1
-ENTRYPOINT ["powershell.exe", "C:/docker-entrypoint.ps1"]
+ENTRYPOINT [ "powershell.exe" , "C:/docker-entrypoint.ps1" ]
 
 CMD [ "node.exe" ]

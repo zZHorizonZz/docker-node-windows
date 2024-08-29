@@ -37,7 +37,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build --file ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}/Dockerfile --tag node:${{ matrix.version }}-${{ matrix.variant }} .
+          docker build --tag node:${{ matrix.version }}-${{ matrix.variant }} ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}
 
       - name: Test for node version
         shell: pwsh
@@ -88,7 +88,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build --file ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}/Dockerfile --tag node:${{ matrix.version }}-${{ matrix.variant }} .
+          docker build --tag node:${{ matrix.version }}-${{ matrix.variant }} ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}
 
       - name: Test for node version
         shell: pwsh
