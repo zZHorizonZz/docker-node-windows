@@ -98,7 +98,7 @@ jobs:
           Write-Host "Matrix version bytes: $bytes"
           $bytes = [System.Text.Encoding]::UTF8.GetBytes($image_node_version)
           Write-Host "Image version bytes: $bytes"
-          if ($image_node_version -ne ${{ matrix.version }}) {
+          if ($image_node_version -ne "${{ matrix.version }}") {
             exit 1
           }
         
