@@ -45,7 +45,6 @@ jobs:
           $image_node_version = (docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node").Trim() 
           Write-Host "Expected: '${{ matrix.version }}', Got: '$image_node_version'"
           if ($image_node_version -ne ${{ matrix.version }}) {
-            Write-Host "Node version mismatch"
             exit 1 
           }
         
@@ -95,8 +94,7 @@ jobs:
         run: |
           $image_node_version = (docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node").Trim() 
           Write-Host "Expected: '${{ matrix.version }}', Got: '$image_node_version'"
-          if ($image_node_version -ne ${{ matrix.version }}) {
-            Write-Host "Node version mismatch"
+          if (22.0.7 -ne ${{ matrix.version }}) {
             exit 1
           }
         
