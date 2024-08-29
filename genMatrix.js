@@ -8,13 +8,14 @@ const testFiles = [
 ];
 
 const nodeDirRegex = /^\d+$/;
+const windowsDirRegex = /^windows-/;
 
 const areTestFilesChanged = (changedFiles) => changedFiles
   .some((file) => testFiles.includes(file));
 
-// Returns a list of the child directories in the given path
+// Returns a list of the child directories in the given path, excluding those starting with 'windows-'
 const getChildDirectories = (parent) => fs.readdirSync(parent, { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory())
+  .filter((dirent) => dirent.isDirectory() && !windowsDirRegex.test(dirent.name))
   .map(({ name }) => path.resolve(parent, name));
 
 const getNodeVersionDirs = (base) => getChildDirectories(base)
