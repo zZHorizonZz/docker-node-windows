@@ -94,7 +94,11 @@ jobs:
         run: |
           $image_node_version = (docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node").Trim() 
           Write-Host "Expected: '${{ matrix.version }}', Got: '$image_node_version'"
-          if (${{ matrix.version }} -ne $image_node_version) {
+          $bytes = [System.Text.Encoding]::UTF8.GetBytes(${{ matrix.version }})
+          Write-Host "Matrix version bytes: $bytes"
+          $bytes = [System.Text.Encoding]::UTF8.GetBytes($image_node_version)
+          Write-Host "Image version bytes: $bytes"
+          if ($image_node_version -ne ${{ matrix.version }}) {
             exit 1
           }
         
