@@ -38,13 +38,8 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          push: false
-          load: true
-          context: .
-          file: ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}/Dockerfile
-          tags: node:${{ matrix.version }}-${{ matrix.variant }}
+        run: |
+          docker build --file ./${{ steps.short-version.outputs.result }}/${{ matrix.variant }}/Dockerfile --tag node:${{ matrix.version }}-${{ matrix.variant }} .
 
       - name: Test for node version
         run: |
