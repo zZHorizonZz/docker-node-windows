@@ -103,8 +103,8 @@ jobs:
         run: |
           $tmp_file = New-TemporaryFile
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          Write-Host "Docker volume mount: $(${{ github.workspace }})$tmp_file:/app/index.js"
-          $output = (docker run --rm -v "${{ github.workspace }}$tmp_file:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
+          Write-Host "Docker volume mount: $(${{ github.workspace }})${tmp_file}:/app/index.js"
+          $output = (docker run --rm -v "${{ github.workspace }}${tmp_file}:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
           if ($output -ne 'success') {
             exit 1
           }
