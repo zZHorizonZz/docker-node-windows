@@ -9,14 +9,14 @@ RUN $newPath = ('C:\nodejs;{0}\Yarn\bin;{1}' -f $env:LOCALAPPDATA, $env:PATH); \
 # doing this first to share cache across versions more aggressively
 
 ENV NODE_VERSION 0.0.0
-ENV CHECKSUM CHECKSUM_x64
+ENV NODE_CHECKSUM CHECKSUM_x64
 
 RUN $url = ('https://nodejs.org/dist/v{0}/node-v{0}-win-x64.zip' -f $env:NODE_VERSION); \
 	Write-Host ('Downloading {0} ...' -f $url); \
 	Invoke-WebRequest -Uri $url -OutFile 'node.zip'; \
 	\
-	Write-Host ('Verifying sha256 ({0}) ...' -f $env:NODE_SHA256); \
-	if ((Get-FileHash node.zip -Algorithm sha256).Hash -ne $env:NODE_SHA256) { throw 'SHA256 mismatch' }; \
+	Write-Host ('Verifying sha256 ({0}) ...' -f $env:NODE_CHECKSUM); \
+	if ((Get-FileHash node.zip -Algorithm sha256).Hash -ne $env:NODE_CHECKSUM) { throw 'SHA256 mismatch' }; \
 	\
 	Write-Host 'Expanding ...'; \
 	Expand-Archive node.zip -DestinationPath C:\; \

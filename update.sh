@@ -184,7 +184,7 @@ function update_node_version() {
         fatal "Failed to fetch checksum for version ${nodeVersion}"
       fi
       sed -Ei -e "s/mcr\.microsoft\.com\/windows\/servercore:version/mcr\.microsoft\.com\/windows\/servercore:ltsc${windows_version}/" "${dockerfile}-tmp"
-      sed -Ei -e 's/^(ENV CHECKSUM ).*/\1'"${checksum}"'/' "${dockerfile}-tmp"
+      sed -Ei -e 's/^(ENV NODE_CHECKSUM ).*/\1'"${checksum}"'/' "${dockerfile}-tmp"
     fi
 
     if diff -q "${dockerfile}-tmp" "${dockerfile}" > /dev/null; then
