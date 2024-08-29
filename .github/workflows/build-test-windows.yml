@@ -54,7 +54,7 @@ jobs:
           $tempDir = New-Item -ItemType Directory -Path $env:TEMP -Name "tempNodeApp" 
           $tmp_file = Join-Path $tempDir "index.js"
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:22.7.0-windows-2019 C:/app/index.js)
+          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:${{ matrix.version }}-${{ matrix.variant }} C:/app/index.js)
           if ($output -ne 'success') {
               Write-Host "Invalid"
           }
@@ -105,7 +105,7 @@ jobs:
           $tempDir = New-Item -ItemType Directory -Path $env:TEMP -Name "tempNodeApp" 
           $tmp_file = Join-Path $tempDir "index.js"
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:22.7.0-windows-2019 C:/app/index.js)
+          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:${{ matrix.version }}-${{ matrix.variant }} C:/app/index.js)
           if ($output -ne 'success') {
               Write-Host "Invalid"
           }
