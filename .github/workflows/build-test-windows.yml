@@ -53,7 +53,8 @@ jobs:
         run: |
           $tmp_file = New-TemporaryFile
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -v "${tmp_file}:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
+          $dockerPath = $tmp_file.FullName.Replace('\', '/') 
+          $output = (docker run --rm -v "$dockerPath:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
           if ($output -ne 'success') {
             exit 1
           }
@@ -103,7 +104,8 @@ jobs:
         run: |
           $tmp_file = New-TemporaryFile
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -v "${tmp_file}:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
+          $dockerPath = $tmp_file.FullName.Replace('\', '/') 
+          $output = (docker run --rm -v "$dockerPath:/app/index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
           if ($output -ne 'success') {
             exit 1
           }
