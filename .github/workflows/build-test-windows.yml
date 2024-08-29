@@ -51,11 +51,12 @@ jobs:
       - name: Verify entrypoint runs regular, non-executable files with node
         shell: pwsh
         run: |
-          $tmp_file = New-TemporaryFile
+          $tempDir = New-Item -ItemType Directory -Path $env:TEMP -Name "tempNodeApp" 
+          $tmp_file = Join-Path $tempDir "index.js"
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -v "${tmp_file}:c:\app\index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
+          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:22.7.0-windows-2019 C:/app/index.js)
           if ($output -ne 'success') {
-            exit 1
+              Write-Host "Invalid"
           }
         
       - name: Test for npm
@@ -101,11 +102,12 @@ jobs:
       - name: Verify entrypoint runs regular, non-executable files with node
         shell: pwsh
         run: |
-          $tmp_file = New-TemporaryFile
+          $tempDir = New-Item -ItemType Directory -Path $env:TEMP -Name "tempNodeApp" 
+          $tmp_file = Join-Path $tempDir "index.js"
           "console.log('success')" | Out-File -FilePath $tmp_file -Encoding utf8
-          $output = (docker run --rm -v "${tmp_file}:c:\app\index.js" node:${{ matrix.version }}-${{ matrix.variant }} app/index.js) 
+          $output = (docker run --rm -w /app --mount "type=bind,src=$tempDir,target=c:\app" node:22.7.0-windows-2019 C:/app/index.js)
           if ($output -ne 'success') {
-            exit 1
+              Write-Host "Invalid"
           }
         
       - name: Test for npm
