@@ -92,11 +92,10 @@ jobs:
       - name: Test for node version
         shell: pwsh
         run: |
-          $image_node_version = ([System.Text.Encoding]::UTF8.GetString(([System.Text.Encoding]::UTF8.GetBytes((docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node").Trim()))))
-          $expected_version = ([System.Text.Encoding]::UTF8.GetString(([System.Text.Encoding]::UTF8.GetBytes(${{ matrix.version }}))))
-          Write-Host "Expected: '$expected_version', Got: '$image_node_version'"
-          if ($image_node_version -ne $expected_version) {
-            exit 1 
+          $image_node_version = (docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} node --print "process.versions.node").Trim() 
+          Write-Host "Expected: '${{ matrix.version }}', Got: '$image_node_version'"
+          if (${{ matrix.version }} -ne $image_node_version) {
+            exit 1
           }
         
       - name: Verify entrypoint runs regular, non-executable files with node
