@@ -24,7 +24,7 @@ const getNodeVersionDirs = (base) => getChildDirectories(base)
 
 // Returns the paths of Dockerfiles that are at: base/*/Dockerfile
 const getDockerfilesInChildDirs = (base) => getChildDirectories(base)
-  .filter((directory) => directory.isDirectory() && !windowsDirRegex.test(directory.name))
+  .filter((directory) => !windowsDirRegex.test(path.basename(directory)))
   // Test print the directories
   .map((childDir) => {
     console.log(childDir);
