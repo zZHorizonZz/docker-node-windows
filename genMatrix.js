@@ -46,7 +46,7 @@ const getAffectedDockerfiles = (filesAdded, filesModified, filesRenamed) => {
     return getAllDockerfiles(__dirname);
   }
 
-  const modifiedDockerfiles = files.filter((file) => file.endsWith('/Dockerfile'));
+  const modifiedDockerfiles = files.filter((file) => file.endsWith('/Dockerfile') && !windowsDirRegex.test(path.dirname(file)));
 
   // Get Dockerfiles affected by modified docker-entrypoint.sh files
   const entrypointAffectedDockerfiles = files
