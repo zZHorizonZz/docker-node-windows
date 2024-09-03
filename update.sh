@@ -151,9 +151,18 @@ function update_node_version() {
 
     # Add GPG keys
     for key_type in "node" "yarn"; do
+      last_line=$(tail -n 1 "keys/${key_type}.keys")
       while read -r line; do
         pattern='"\$\{'$(echo "${key_type}" | tr '[:lower:]' '[:upper:]')'_KEYS\[@\]\}"'
-        sed -Ei -e "s/([ \\t]*)(${pattern})/\\1${line}${new_line}\\1\\2/" "${dockerfile}-tmp"
+        if is_windows "${variant}"; then
+          if [ "$line" = "$last_line" ]; then  # Check if it's the last key
+            sed -Ei -e "s/([ \\t]*)(${pattern})/\\1'${line}'${new_line}\\1\\2/" "${dockerfile}-tmp"
+          else
+            sed -Ei -e "s/([ \\t]*)(${pattern})/\\1'${line}',${new_line}\\1\\2/" "${dockerfile}-tmp"
+          fi
+        else
+          sed -Ei -e "s/([ \\t]*)(${pattern})/\\1${line}${new_line}\\1\\2/" "${dockerfile}-tmp"
+        fi
       done < "keys/${key_type}.keys"
       sed -Ei -e "/${pattern}/d" "${dockerfile}-tmp"
     done

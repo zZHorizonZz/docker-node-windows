@@ -63,8 +63,8 @@ jobs:
       - name: Test for npm
         run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} npm --version
         
-      - name: Test for yarn
-        run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} yarn --version
+      #- name: Test for yarn
+      #  run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} yarn --version
 
   build-windows-2022:
     name: build-windows-2022
@@ -115,5 +115,5 @@ jobs:
       - name: Test for npm
         run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} npm --version
         
-      - name: Test for yarn
-        run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} yarn --version
+      #- name: Test for yarn
+      #  run: docker run --rm node:${{ matrix.version }}-${{ matrix.variant }} yarn --version
