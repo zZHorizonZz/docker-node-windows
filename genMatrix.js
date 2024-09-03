@@ -24,11 +24,6 @@ const getNodeVersionDirs = (base) => getChildDirectories(base)
 
 // Returns the paths of Dockerfiles that are at: base/*/Dockerfile
 const getDockerfilesInChildDirs = (base) => getChildDirectories(base)
-  .map((childDir) => {
-    console.log(`Checking ${childDir}`);
-    return childDir;
-  })
-  .filter((directory) => !windowsDirRegex.test(path.basename(directory)))
   .map((childDir) => path.resolve(childDir, 'Dockerfile'));
 
 const getAllDockerfiles = (base) => getNodeVersionDirs(base).flatMap(getDockerfilesInChildDirs);
@@ -46,7 +41,7 @@ const getAffectedDockerfiles = (filesAdded, filesModified, filesRenamed) => {
     return getAllDockerfiles(__dirname);
   }
 
-  const modifiedDockerfiles = files.filter((file) => file.endsWith('/Dockerfile') && !windowsDirRegex.test(path.dirname(file)));
+  const modifiedDockerfiles = files.filter((file) => file.endsWith('/Dockerfile'));
 
   // Get Dockerfiles affected by modified docker-entrypoint.sh files
   const entrypointAffectedDockerfiles = files
@@ -76,7 +71,8 @@ const getDockerfileMatrixEntry = (file) => {
 const generateBuildMatrix = (filesAdded, filesModified, filesRenamed) => {
   const dockerfiles = [...new Set(getAffectedDockerfiles(filesAdded, filesModified, filesRenamed))];
 
-  const entries = dockerfiles.map(getDockerfileMatrixEntry);
+  let entries = dockerfiles.map(getDockerfileMatrixEntry);
+  entries = entries.filter((entry) => !windowsDirRegex.test(entry.variant));
 
   // Return null if there are no entries so we can skip the matrix step
   return entries.length
