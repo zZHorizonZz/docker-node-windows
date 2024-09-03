@@ -8,6 +8,7 @@ const testFiles = [
 ];
 
 const nodeDirRegex = /^\d+$/;
+// Directories starting with 'windows-' are excluded from the matrix windows-2019 are excluded for example
 const windowsDirRegex = /^windows-/;
 
 const areTestFilesChanged = (changedFiles) => changedFiles
@@ -15,7 +16,7 @@ const areTestFilesChanged = (changedFiles) => changedFiles
 
 // Returns a list of the child directories in the given path, excluding those starting with 'windows-'
 const getChildDirectories = (parent) => fs.readdirSync(parent, { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory() && !windowsDirRegex.test(dirent.name))
+  .filter((directory) => directory.isDirectory())
   .map(({ name }) => path.resolve(parent, name));
 
 const getNodeVersionDirs = (base) => getChildDirectories(base)
@@ -23,6 +24,12 @@ const getNodeVersionDirs = (base) => getChildDirectories(base)
 
 // Returns the paths of Dockerfiles that are at: base/*/Dockerfile
 const getDockerfilesInChildDirs = (base) => getChildDirectories(base)
+  .filter((directory) => directory.isDirectory() && !windowsDirRegex.test(directory.name))
+  // Test print the directories
+  .map((childDir) => {
+    console.log(childDir);
+    return childDir;
+  })
   .map((childDir) => path.resolve(childDir, 'Dockerfile'));
 
 const getAllDockerfiles = (base) => getNodeVersionDirs(base).flatMap(getDockerfilesInChildDirs);
