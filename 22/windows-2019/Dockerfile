@@ -1,9 +1,9 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows/servercore:ltsc2019 as installer
 
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # PATH isn't actually set in the Docker image, so we have to set it from within the container
-RUN $newPath = ('C:\nodejs;{0}\Yarn\bin;C:\Program Files (x86)\GnuPG\bin;{1}' -f $env:LOCALAPPDATA, $env:PATH); \
+RUN $newPath = ('C:\Program Files (x86)\GnuPG\bin;{0}' -f $env:PATH); \
 	Write-Host ('Updating PATH: {0}' -f $newPath); \
 	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine)
 # doing this first to share cache across versions more aggressively
@@ -15,7 +15,6 @@ ENV GPG_VERSION 2.4.5_20240307
 
 RUN Invoke-WebRequest $('https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-{0}.exe' -f $env:GPG_VERSION) -OutFile 'gpg-installer.exe'; \
 	Start-Process -FilePath 'gpg-installer.exe' -ArgumentList '/S' -Wait; \
-	Remove-Item gpg-installer.exe -Force; \
 	gpg --version;
 
 RUN @( \
@@ -43,7 +42,21 @@ RUN @( \
     Expand-Archive node.zip -DestinationPath C:\ ; \
     Rename-Item -Path $('C:\node-v{0}-win-x64' -f $env:NODE_VERSION) -NewName 'C:\nodejs'
 
+FROM mcr.microsoft.com/windows/servercore:ltsc2019 as runner
+
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+
+RUN $newPath = ('C:\nodejs;{0}' -f $env:PATH); \
+	Write-Host ('Updating PATH: {0}' -f $newPath); \
+	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine)
+
+COPY --from=installer C:/nodejs C:/nodejs
+
 COPY docker-entrypoint.ps1 C:/docker-entrypoint.ps1
 ENTRYPOINT [ "powershell.exe" , "C:/docker-entrypoint.ps1" ]
+
+# Smoke test
+RUN node --version; \
+	npm --version;
 	
 CMD [ "node.exe" ]

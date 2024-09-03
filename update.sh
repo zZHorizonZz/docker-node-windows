@@ -193,6 +193,7 @@ function update_node_version() {
         fatal "Failed to fetch checksum for version ${nodeVersion}"
       fi
       sed -Ei -e "s/mcr\.microsoft\.com\/windows\/servercore:version/mcr\.microsoft\.com\/windows\/servercore:ltsc${windows_version}/" "${dockerfile}-tmp"
+      sed -Ei -e "s/mcr\.microsoft\.com\/windows\/nanoserver:version/mcr\.microsoft\.com\/windows\/nanoserver:ltsc${windows_version}/" "${dockerfile}-tmp"
       sed -Ei -e 's/^(ENV NODE_CHECKSUM ).*/\1'"${checksum}"'/' "${dockerfile}-tmp"
     fi
 
@@ -227,8 +228,6 @@ for version in "${versions[@]}"; do
   # Get supported variants according the target architecture
   # See details in function.sh
   IFS=' ' read -ra variants <<< "$(get_variants "${parentpath}")"
-
-  echo "Supported variants for ${parentpath}: ${variants[@]}"
 
   pids=()
 
