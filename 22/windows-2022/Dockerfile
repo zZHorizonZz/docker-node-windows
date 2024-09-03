@@ -13,8 +13,6 @@ ENV NODE_CHECKSUM 3fc638727974262b4f65a6b1b43c22fb2d80671cdcb50e1237e0b05d1330aa
 
 ENV GPG_VERSION 2.4.5_20240307
 
-ENV GPG_TTY dwufhwuhf
-
 RUN Invoke-WebRequest $('https://www.gnupg.org/ftp/gcrypt/binary/gnupg-w32-{0}.exe' -f $env:GPG_VERSION) -OutFile 'gpg-installer.exe'; \
 	Start-Process -FilePath 'gpg-installer.exe' -ArgumentList '/S' -Wait; \
 	Remove-Item gpg-installer.exe -Force; \
